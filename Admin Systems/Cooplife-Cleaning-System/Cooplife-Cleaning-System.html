@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cooplife Insurance Ltd - Cleaning Days</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Excel export library -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ================= TOOLBAR ================= -->
+
+    <div class="toolbar no-print">
+
+        <button onclick="generateCalendar()">
+            Generate Month
+        </button>
+
+        <button onclick="saveMonth()">
+            Save Month
+        </button>
+
+        <button onclick="loadMonth()">
+            Load Month
+        </button>
+
+        <button class="excel-btn" onclick="exportExcel()">
+            Download Excel
+        </button>
+
+        <button class="print-btn" onclick="window.print()">
+            Print
+        </button>
+
+    </div>
+
+
+    <!-- ================= SETTINGS ================= -->
+
+    <div class="settings no-print">
+
+        <div>
+            <label>Month</label>
+            <select id="month"></select>
+        </div>
+
+        <div>
+            <label>Year</label>
+            <input
+                type="number"
+                id="year"
+                min="2000"
+                max="2100"
+            >
+        </div>
+
+        <div>
+            <label>One day (Rs.)</label>
+            <input
+                type="number"
+                id="rate"
+                value="2500"
+                step="0.01"
+            >
+        </div>
+
+        <div>
+            <label>03rd Floor Workers</label>
+            <input
+                type="number"
+                id="workers3"
+                value="1"
+                min="0"
+            >
+        </div>
+
+        <div>
+            <label>01st Floor Workers</label>
+            <input
+                type="number"
+                id="workers1"
+                value="1"
+                min="0"
+            >
+        </div>
+
+        <div>
+            <label>Maximum Extra Payment</label>
+            <input
+                type="number"
+                id="extra"
+                value="0"
+                min="0"
+                step="0.01"
+            >
+        </div>
+
+    </div>
+
+
+    <!-- ================= REPORT ================= -->
+
+    <div id="report">
+
+        <h1>
+            Cooplife Insurance Ltd
+        </h1>
+
+
+        <div class="report-heading">
+
+            <div>
+                Cleaning Days
+            </div>
+
+            <div>
+                Month of <span id="monthTitle"></span>
+            </div>
+
+        </div>
+
+
+        <!-- ================= ATTENDANCE TABLE ================= -->
+
+        <table id="attendanceTable">
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>03rd Floor</th>
+
+                    <th>01st Floor</th>
+
+                    <th>Total days</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="attendanceBody">
+
+            </tbody>
+
+        </table>
+
+
+        <!-- ================= HOLIDAYS ================= -->
+
+        <div class="holiday-section no-print">
+
+            <h3>
+                Public Holidays
+            </h3>
+
+            <div id="holidayRows"></div>
+
+            <button onclick="addHolidayRow()">
+                + Add Holiday
+            </button>
+
+        </div>
+
+
+        <!-- ================= PAYMENT SECTION ================= -->
+
+        <div class="payment-page">
+
+    <table class="payment-table">
+
+            <tbody>
+
+                <tr>
+                    <td></td>
+                    <td colspan="2" class="rs-title">
+                        Rs
+                    </td>
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>
+                        One day
+                    </td>
+
+                    <td id="paymentRate">
+                        2,500.00
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>
+                        Days
+                    </td>
+
+                    <td id="paymentDays">
+                        19
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>
+                        02 Workers
+                    </td>
+
+                    <td id="paymentWorkers">
+                        2
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>
+                        Total
+                    </td>
+
+                    <td id="paymentTotal">
+                        100,000.00
+                    </td>
+
+                </tr>
+
+
+                <tr class="blank-row">
+
+                    <td colspan="3"></td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>
+                        Total Working days
+                    </td>
+
+                    <td id="totalWorkingDays">
+                        19
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>
+                        Maximum Extra Payment
+                    </td>
+
+                    <td id="extraPayment">
+                        -
+                    </td>
+
+                </tr>
+
+
+                <tr class="blank-row">
+
+                    <td colspan="3"></td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>
+                        Monthly Payment
+                    </td>
+
+                    <td id="monthlyPayment">
+                        100,000.00
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>
+                        Maximum Extra Payment
+                    </td>
+
+                    <td id="extraPaymentBottom">
+                        -
+                    </td>
+
+                </tr>
+
+
+                <tr class="final-total">
+
+                    <td></td>
+
+                    <td></td>
+
+                    <td id="grandTotal">
+                        100,000.00
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+         </table>
+
+</div>
+
+    </div>
+
+</div>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC Repair Records</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <h1>❄️ AC Repair Records</h1>
+        <p>Excel-Based AC Repair & Maintenance Management System</p>
+    </div>
+</header>
+
+<main class="container">
+    <section class="file-card">
+        <div class="file-status">
+            <div>
+                <div class="file-name" id="fileName">No Excel file selected</div>
+                <div class="file-message" id="fileMessage">
+                    Open the AC repair workbook from D:\tharusha.
+                </div>
+            </div>
+            <div class="buttons file-buttons">
+                <button class="btn-primary" id="openFileButton" type="button">📂 Open Excel File</button>
+                <button class="btn-excel" id="saveFileButton" type="button" disabled>💾 Save Excel File</button>
+            </div>
+        </div>
+        <div id="status" class="status" aria-live="polite"></div>
+    </section>
+
+    <section class="summary">
+        <div class="summary-card">
+            <h3>Filtered Records</h3>
+            <div class="value" id="totalRecords">0</div>
+        </div>
+        <div class="summary-card">
+            <h3>Total Amount</h3>
+            <div class="value" id="totalAmount">0.00</div>
+        </div>
+        <div class="summary-card">
+            <h3>Branches</h3>
+            <div class="value" id="totalBranches">0</div>
+        </div>
+        <div class="summary-card">
+            <h3>Companies / Repairers</h3>
+            <div class="value" id="totalRepairers">0</div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-title">
+            <h2 id="formTitle">Add AC Repair Record</h2>
+        </div>
+
+        <form id="repairForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="branch">Branch *</label>
+                    <input type="text" id="branch" placeholder="Enter branch" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date *</label>
+                    <input type="date" id="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="assetCode">Asset Code *</label>
+                    <input type="text" id="assetCode" placeholder="e.g. AC-001" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="floor">Floor</label>
+                    <input type="text" id="floor" placeholder="e.g. 1st Floor">
+                </div>
+
+                <div class="form-group">
+                    <label for="company">Company</label>
+                    <input type="text" id="company" placeholder="Repair company (optional)">
+                </div>
+
+                <div class="form-group">
+                    <label for="repairPerson">Repair Person</label>
+                    <input type="text" id="repairPerson" placeholder="Technician / repair person (optional)">
+                </div>
+
+                <div class="form-group form-group-wide">
+                    <label for="description">Description *</label>
+                    <input type="text" id="description" placeholder="Describe the repair or service" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount *</label>
+                    <input type="number" id="amount" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-primary" id="submitButton" type="submit">➕ Add Record</button>
+                <button class="btn-secondary" id="clearButton" type="button">↩ Clear</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card">
+        <div class="card-title filters-title">
+            <h2>Filter Records</h2>
+            <button class="btn-secondary small" id="resetFiltersButton" type="button">Reset Filters</button>
+        </div>
+
+        <div class="filter-grid">
+            <div class="form-group">
+                <label for="branchFilter">Branch</label>
+                <select id="branchFilter">
+                    <option value="">All Branches</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="companyFilter">Company</label>
+                <select id="companyFilter">
+                    <option value="">All Companies</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="repairPersonFilter">Repair Person</label>
+                <select id="repairPersonFilter">
+                    <option value="">All Repair Persons</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fromDate">From Date</label>
+                <input type="date" id="fromDate">
+            </div>
+
+            <div class="form-group">
+                <label for="toDate">To Date</label>
+                <input type="date" id="toDate">
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-title table-title">
+            <h2>Repair Records</h2>
+            <div class="buttons">
+                <button class="btn-excel" id="exportButton" type="button">📊 Export Filtered Excel</button>
+                <button class="btn-secondary" id="printButton" type="button">🖨 Print Report</button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="recordsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Branch</th>
+                        <th>Date</th>
+                        <th>Asset Code</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Floor</th>
+                        <th>Company</th>
+                        <th>Repair Person</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsBody">
+                    <tr>
+                        <td colspan="10" class="empty-state">Open an Excel file to view records.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <p>AC Repair Records • Excel-based management system • Data workbook intended for D:\tharusha</p>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

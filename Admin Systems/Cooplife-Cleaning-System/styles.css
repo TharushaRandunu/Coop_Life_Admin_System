@@ -1,0 +1,386 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: white;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
+
+
+/* ================= TOOLBAR ================= */
+
+.toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.toolbar button,
+.holiday-section button {
+    border: none;
+    padding: 9px 15px;
+    border-radius: 4px;
+    background: #135d9e;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.toolbar button:hover,
+.holiday-section button:hover {
+    opacity: 0.9;
+}
+
+.toolbar .excel-btn {
+    background: #198754;
+}
+
+.toolbar .print-btn {
+    background: #666;
+}
+
+
+/* ================= SETTINGS ================= */
+
+.settings {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+
+    padding: 12px;
+    margin-bottom: 20px;
+
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+}
+
+.settings label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.settings input,
+.settings select {
+    width: 100%;
+    padding: 7px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    background: white;
+}
+
+
+/* ================= REPORT ================= */
+
+h1 {
+    text-align: center;
+    font-size: 21px;
+    margin: 5px 0 12px 0;
+}
+
+
+/* ================= REPORT HEADER ================= */
+
+.report-heading {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    border: 1px solid black;
+    border-bottom: none;
+
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+
+    padding: 6px;
+}
+
+.report-heading div:first-child {
+    text-align: right;
+    padding-right: 80px;
+}
+
+.report-heading div:last-child {
+    text-align: left;
+    padding-left: 20px;
+}
+
+
+/* ================= ATTENDANCE TABLE ================= */
+
+#attendanceTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#attendanceTable th,
+#attendanceTable td {
+    border: 1px solid black;
+    padding: 4px 7px;
+    height: 28px;
+    font-size: 13px;
+    text-align: center;
+}
+
+#attendanceTable th {
+    font-weight: bold;
+    background: #f7f7f7;
+}
+
+#attendanceTable th:first-child,
+#attendanceTable td:first-child {
+    width: 25%;
+    text-align: left;
+}
+
+#attendanceTable th:nth-child(2),
+#attendanceTable th:nth-child(3) {
+    width: 25%;
+}
+
+#attendanceTable th:nth-child(4) {
+    width: 25%;
+}
+
+
+/* ================= WEEKENDS ================= */
+
+.weekend-row td {
+    background: #fafafa;
+}
+
+
+/* ================= HOLIDAYS ================= */
+
+.holiday-row-table td {
+    background: #fff4c7;
+}
+
+
+/* ================= ATTENDANCE INPUT ================= */
+
+.attendance-input {
+    width: 55px;
+
+    border: 1px solid #aaa;
+    border-radius: 3px;
+
+    background: white;
+
+    text-align: center;
+
+    font-size: 13px;
+    font-weight: bold;
+
+    padding: 4px;
+}
+
+/*
+   IMPORTANT:
+   Attendance is always 0 or 1.
+*/
+
+.attendance-input:focus {
+    outline: 2px solid #135d9e;
+}
+
+
+/* ================= STATUS ================= */
+
+.status-label {
+    font-size: 11px;
+    color: #666;
+    margin-left: 5px;
+}
+
+
+/* ================= HOLIDAY SECTION ================= */
+
+.holiday-section {
+    margin-top: 15px;
+    padding: 12px;
+
+    border: 1px solid #ccc;
+
+    background: #f8f8f8;
+}
+
+.holiday-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+}
+
+.holiday-row {
+    display: grid;
+    grid-template-columns: 180px 1fr auto;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.holiday-row input {
+    padding: 7px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+}
+
+.holiday-row button {
+    background: #b42318;
+}
+
+
+/* ================= PAYMENT TABLE ================= */
+
+.payment-page {
+    margin-top: 20px;
+}
+
+.payment-table {
+    width: 55%;
+    margin-left: auto;
+    border-collapse: collapse;
+}
+
+.payment-table td {
+    border: none;
+    padding: 4px 8px;
+    font-size: 14px;
+}
+
+.payment-table td:nth-child(2) {
+    text-align: left;
+}
+
+.payment-table td:last-child {
+    text-align: right;
+    min-width: 150px;
+}
+
+.payment-table .rs-title {
+    text-align: left;
+    font-weight: bold;
+}
+
+.blank-row td {
+    height: 12px;
+}
+
+.final-total td {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 850px) {
+
+    .settings {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .payment-table {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 10px;
+    }
+
+    .settings {
+        grid-template-columns: 1fr;
+    }
+
+    .report-heading {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .report-heading div:first-child,
+    .report-heading div:last-child {
+        text-align: center;
+        padding: 0;
+    }
+
+}
+
+
+/* =========================================================
+   PRINTING
+   ========================================================= */
+
+@media print {
+
+    body {
+        background: white;
+    }
+
+    .container {
+        max-width: none;
+        padding: 0;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+
+    /*
+       Attendance report remains on page 1.
+    */
+
+    #report {
+        width: 100%;
+    }
+
+
+    /*
+       PAYMENT SECTION STARTS ON A NEW PAGE.
+    */
+
+    .payment-page {
+        page-break-before: always;
+        break-before: page;
+
+        margin-top: 0;
+    }
+
+
+    #attendanceTable th,
+    #attendanceTable td {
+        height: 25px;
+    }
+
+
+    .payment-table {
+        width: 55%;
+        margin-top: 20px;
+    }
+
+
+    /*
+       Make sure inputs print as simple 0/1 values.
+    */
+
+    .attendance-input {
+        border: none;
+        background: transparent;
+        padding: 0;
+    }
+
+}
