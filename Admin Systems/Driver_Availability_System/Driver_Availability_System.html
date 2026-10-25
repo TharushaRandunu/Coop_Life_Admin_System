@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Driver Availability & Schedule Manager</title>
+<style>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#172033;--muted:#65718a;--line:#e2e8f0;--blue:#2457d6;--green:#16845b;--orange:#c76b12;--red:#c0392b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#163b78,#2866db);color:#fff;padding:25px max(18px,calc((100% - 1250px)/2))}header h1{margin:0;font-size:clamp(1.5rem,3vw,2rem)}header p{margin:4px 0 0;color:#e4ecff}
+main{max-width:1250px;margin:22px auto;padding:0 16px 40px}.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 15px #1c35500a}.card{padding:17px}.card span{color:var(--muted);font-size:.9rem}.card h2{margin:4px 0 0;font-size:1.8rem}.green{border-top:4px solid var(--green)}.orange{border-top:4px solid var(--orange)}.blue{border-top:4px solid var(--blue)}.red{border-top:4px solid var(--red)}
+.panel{padding:20px;margin-bottom:18px}.panel h2{font-size:1.15rem;margin:0 0 14px}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:end}.form-grid .wide{grid-column:span 2}label{display:block;color:var(--muted);font-size:.86rem}input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:10px 11px;border:1px solid #cfd8e6;border-radius:8px;background:#fff;color:var(--ink);margin-top:5px;min-width:0}textarea{resize:vertical;min-height:90px}button{border:0;border-radius:8px;padding:10px 14px;background:var(--blue);color:#fff;cursor:pointer;font-weight:600}button:hover{filter:brightness(.94)}button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#e8eef8;color:#253858}.danger{background:#b93838}.small{padding:6px 9px;font-size:.82rem}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:9px}table{border-collapse:collapse;width:100%;min-width:780px;background:white}th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f6f8fc;color:#4c5870;font-size:.82rem;white-space:nowrap}tr:last-child td{border-bottom:0}.status{display:inline-block;padding:3px 8px;border-radius:99px;font-size:.78rem;font-weight:700;background:#e7f7ef;color:#126844}.status.out{background:#fff0dc;color:#99500a}.status.overdue{background:#ffe6e3;color:#a52d22}.status.scheduled{background:#e8efff;color:#214eb8}.status.done{background:#e9edf2;color:#485365}.filters{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin:12px 0}.filters label{min-width:145px;flex:1}.note-layout{display:grid;grid-template-columns:minmax(260px, .85fr) minmax(0,1.5fr);gap:18px}.note-list{display:grid;gap:10px;max-height:430px;overflow:auto}.note-item{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff}.note-item.due{border-left:4px solid var(--red)}.note-item.upcoming{border-left:4px solid var(--orange)}.note-item.completed{opacity:.7}.note-item h3{margin:0 0 4px;font-size:1rem}.note-meta{font-size:.8rem;color:var(--muted)}.note-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.muted{color:var(--muted)}.empty{padding:18px;color:var(--muted);text-align:center}.message{min-height:1.4em;color:var(--green);font-size:.9rem}.reminder-banner{display:none;background:#fff1d8;color:#7a4600;padding:12px 15px;border-radius:10px;margin-bottom:16px;border:1px solid #f1d59d}.reminder-banner.show{display:block}.help{font-size:.85rem;color:var(--muted)}@media(max-width:850px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.note-layout{grid-template-columns:1fr}}@media(max-width:520px){main{padding:0 10px 28px}.panel{padding:14px}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:span 1}.summary{gap:8px}.card{padding:12px}.card h2{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<header><h1>Driver Availability & Schedule Manager</h1><p>Track drivers, trips, return times and scheduled reminders.</p></header>
+<main>
+<div id="reminderBanner" class="reminder-banner" role="alert"></div>
+<section class="summary">
+<div class="card green"><span>In Office</span><h2 id="inCount">0</h2></div>
+<div class="card orange"><span>Out of Office</span><h2 id="outCount">0</h2></div>
+<div class="card blue"><span>Scheduled Notes</span><h2 id="noteCount">0</h2></div>
+<div class="card"><span>Today's Date</span><h2 id="today">—</h2></div>
+</section>
+
+<section class="panel">
+<h2>Add Driver</h2>
+<form id="driverForm" class="form-grid">
+<label>Office ID<input id="driverId" required maxlength="30" placeholder="e.g. DR-001"></label>
+<label>Driver name<input id="driverName" required maxlength="100" placeholder="Full name"></label>
+<div><button type="submit">Add Driver</button></div>
+</form>
+</section>
+
+<section class="panel">
+<h2>Record Driver Departure</h2>
+<form id="tripForm" class="form-grid">
+<label>Driver<select id="tripDriver" required><option value="">Select driver</option></select></label>
+<label>Destination<input id="destination" required maxlength="180" placeholder="Where is the driver going?"></label>
+<label>Departure time<input id="outTime" type="time" required></label>
+<label>Expected return (optional)<input id="expectedTime" type="time"></label>
+<label class="wide">Trip note (optional)<input id="tripNote" maxlength="300" placeholder="Purpose, contact person, instructions"></label>
+<div><button type="submit">Record Departure</button></div>
+</form>
+</section>
+
+<section class="panel">
+<div class="section-heading"><h2>Notes & Scheduled Reminders</h2><span class="help">Example: “Driver must go to the bank at 3:00 PM.”</span></div>
+<div class="note-layout">
+<form id="noteForm">
+<label>Reminder title<input id="noteTitle" required maxlength="120" placeholder="Driver must go to the bank"></label>
+<label>Driver (optional)<select id="noteDriver"><option value="">No specific driver</option></select></label>
+<label>Destination / location<input id="notePlace" maxlength="180" placeholder="Bank, customer, office…"></label>
+<label>Date<input id="noteDate" type="date" required></label>
+<label>Time<input id="noteTime" type="time" required value="15:00"></label>
+<label>Details<textarea id="noteDetails" maxlength="1000" placeholder="Address, contact number, documents to take…"></textarea></label>
+<button type="submit">Save Reminder</button>
+<p class="help">Reminders are stored in this browser. Keep this page open around the scheduled time to receive an on-screen alert.</p>
+<p id="noteMessage" class="message" role="status"></p>
+</form>
+<div><h3 style="margin-top:0">Reminder list</h3><div id="noteList" class="note-list"><div class="empty">No reminders yet.</div></div></div>
+</div>
+</section>
+
+<section class="panel">
+<div class="section-heading"><h2>Today's Driver Status</h2><div><button id="exportBtn">Export Excel</button> <button id="exportCsvBtn" class="secondary">Export CSV</button></div></div>
+<div class="table-wrap"><table><thead><tr><th>Office ID</th><th>Driver</th><th>Destination</th><th>Out time</th><th>Expected return</th><th>Actual return</th><th>Status</th><th>Action</th></tr></thead><tbody id="driverTable"></tbody></table></div>
+</section>
+
+<section class="panel">
+<h2>Trip History</h2>
+<div class="filters">
+<label>From date<input type="date" id="fromDate"></label><label>To date<input type="date" id="toDate"></label>
+<label>Driver / ID / destination<input id="searchText" placeholder="Search records"></label>
+<button id="filterBtn">Filter</button><button id="clearBtn" class="secondary">Clear</button>
+</div>
+<div class="table-wrap"><table><thead><tr><th>Date</th><th>Office ID</th><th>Driver</th><th>Destination</th><th>Out time</th><th>Expected return</th><th>Actual return</th><th>Trip note</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+<p id="recordCount" class="help"></p>
+</section>
+
+<section class="panel">
+<h2>Backup & Restore</h2>
+<p class="help">Export your data regularly. Excel export is a report; use the JSON backup to preserve and restore all drivers, trips and reminders.</p>
+<div class="filters"><button id="backupBtn">Download Full Backup (JSON)</button><label>Restore backup (.json)<input type="file" id="backupFile" accept=".json,application/json"></label><button id="restoreBtn" class="secondary">Restore JSON</button></div>
+<p id="message" class="message" role="status"></p>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const KEY = 'driverAvailabilityManager_v2';
+const todayISO = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+let state = {drivers:[], trips:[], notes:[]};
+let alerted = new Set();
+function load(){
+ try { const raw=localStorage.getItem(KEY); if(raw){const parsed=JSON.parse(raw);state={drivers:Array.isArray(parsed.drivers)?parsed.drivers:[],trips:Array.isArray(parsed.trips)?parsed.trips:[],notes:Array.isArray(parsed.notes)?parsed.notes:[]};} }
+ catch(e){console.error(e);showMessage('Could not read saved data. Export or restore a backup if available.',true);}
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){showMessage('Could not save data. Browser storage may be full or disabled.',true);}}
+function showMessage(msg,error=false){$('message').textContent=msg;$('message').style.color=error?'var(--red)':'var(--green)';}
+function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function timeNow(){const d=new Date();return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function fmtTime(t){if(!t)return '—';const [h,m]=t.split(':').map(Number);return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
+function fmtDate(d){if(!d)return '—';return new Date(`${d}T00:00:00`).toLocaleDateString();}
+function driverName(id){return state.drivers.find(d=>d.id===id)?.name || 'Unknown driver';}
+function refreshDriverOptions(){
+ const opts=state.drivers.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(d=>`<option value="${esc(d.id)}">${esc(d.officeId)} — ${esc(d.name)}</option>`).join('');
+ $('tripDriver').innerHTML='<option value="">Select driver</option>'+opts;
+ $('noteDriver').innerHTML='<option value="">No specific driver</option>'+opts;
+}
+function render(){
+ $('today').textContent=new Date().toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+ refreshDriverOptions();
+ const active=state.trips.filter(t=>t.date===todayISO()&&!t.actualReturn);
+ $('outCount').textContent=active.length;
+ $('inCount').textContent=Math.max(0,state.drivers.length-active.length);
+ $('noteCount').textContent=state.notes.filter(n=>!n.done).length;
+ const todays=state.trips.filter(t=>t.date===todayISO()).sort((a,b)=>b.outTime.localeCompare(a.outTime));
+ $('driverTable').innerHTML=todays.length?todays.map(t=>{
+  const late=!t.actualReturn&&t.expectedTime&&timeNow()>t.expectedTime;
+  const status=t.actualReturn?'<span class="status">Returned</span>':late?'<span class="status overdue">Return overdue</span>':'<span class="status out">Out</span>';
+  return `<tr><td>${esc(t.officeId)}</td><td>${esc(t.driver)}</td><td>${esc(t.destination)}</td><td>${fmtTime(t.outTime)}</td><td>${fmtTime(t.expectedTime)}</td><td>${fmtTime(t.actualReturn)}</td><td>${status}</td><td>${t.actualReturn?'—':`<button class="small" data-return="${esc(t.id)}">Mark returned</button>`}</td></tr>`;
+ }).join(''):'<tr><td colspan="8" class="empty">No trips recorded today.</td></tr>';
+ renderNotes();renderHistory();
+}
+function renderNotes(){
+ const notes=state.notes.slice().sort((a,b)=>(a.done?1:0)-(b.done?1:0)||(`${a.date}T${a.time}`).localeCompare(`${b.date}T${b.time}`));
+ $('noteList').innerHTML=notes.length?notes.map(n=>{
+  const isDue=!n.done&&(`${n.date}T${n.time}`<=`${todayISO()}T${timeNow()}`);
+  const cls=n.done?'completed':isDue?'due':n.date===todayISO()?'upcoming':'';
+  return `<article class="note-item ${cls}"><h3>${esc(n.title)}</h3><div class="note-meta">${fmtDate(n.date)} · ${fmtTime(n.time)}${n.driverId?' · '+esc(driverName(n.driverId)):''}${n.place?' · '+esc(n.place):''}</div>${n.details?`<p>${esc(n.details).replace(/\n/g,'<br>')}</p>`:''}<div class="note-actions">${n.done?'<span class="status done">Completed</span>':`<button class="small" data-done="${esc(n.id)}">Mark done</button>`}<button class="small danger" data-delete-note="${esc(n.id)}">Delete</button></div></article>`;
+ }).join(''):'<div class="empty">No reminders yet. Add one on the left.</div>';
+}
+function renderHistory(){
+ const from=$('fromDate').value,to=$('toDate').value,q=$('searchText').value.trim().toLowerCase();
+ const rows=state.trips.filter(t=>(!from||t.date>=from)&&(!to||t.date<=to)&&[t.driver,t.officeId,t.destination,t.note].some(v=>String(v||'').toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date)||b.outTime.localeCompare(a.outTime));
+ $('historyTable').innerHTML=rows.length?rows.map(t=>`<tr><td>${fmtDate(t.date)}</td><td>${esc(t.officeId)}</td><td>${esc(t.driver)}</td><td>${esc(t.destination)}</td><td>${fmtTime(t.outTime)}</td><td>${fmtTime(t.expectedTime)}</td><td>${fmtTime(t.actualReturn)}</td><td>${esc(t.note||'—')}</td></tr>`).join(''):'<tr><td colspan="8" class="empty">No matching records.</td></tr>';
+ $('recordCount').textContent=`${rows.length} record(s) shown`;
+}
+$('driverForm').addEventListener('submit',e=>{
+ e.preventDefault();const officeId=$('driverId').value.trim(),name=$('driverName').value.trim();
+ if(state.drivers.some(d=>d.officeId.toLowerCase()===officeId.toLowerCase()))return alert('That Office ID already exists.');
+ state.drivers.push({id:uid(),officeId,name,createdAt:new Date().toISOString()});save();e.target.reset();render();
+});
+$('tripForm').addEventListener('submit',e=>{
+ e.preventDefault();const d=state.drivers.find(x=>x.id===$('tripDriver').value);if(!d)return alert('Please select a driver.');
+ if(state.trips.some(t=>t.driverId===d.id&&t.date===todayISO()&&!t.actualReturn))return alert('This driver already has an open trip. Mark the previous trip as returned first.');
+ state.trips.push({id:uid(),driverId:d.id,officeId:d.officeId,driver:d.name,destination:$('destination').value.trim(),date:todayISO(),outTime:$('outTime').value,expectedTime:$('expectedTime').value,actualReturn:'',note:$('tripNote').value.trim()});
+ save();e.target.reset();render();
+});
+$('noteForm').addEventListener('submit',e=>{
+ e.preventDefault();state.notes.push({id:uid(),title:$('noteTitle').value.trim(),driverId:$('noteDriver').value,place:$('notePlace').value.trim(),date:$('noteDate').value,time:$('noteTime').value,details:$('noteDetails').value.trim(),done:false,alerted:false,createdAt:new Date().toISOString()});
+ save();e.target.reset();$('noteDate').value=todayISO();$('noteTime').value='15:00';$('noteMessage').textContent='Reminder saved.';render();checkReminders();
+});
+document.addEventListener('click',e=>{
+ const ret=e.target.closest('[data-return]');if(ret){const t=state.trips.find(x=>x.id===ret.dataset.return);if(t){t.actualReturn=timeNow();t.returnedAt=new Date().toISOString();save();render();}}
+ const done=e.target.closest('[data-done]');if(done){const n=state.notes.find(x=>x.id===done.dataset.done);if(n){n.done=true;n.completedAt=new Date().toISOString();save();render();}}
+ const del=e.target.closest('[data-delete-note]');if(del&&confirm('Delete this reminder?')){state.notes=state.notes.filter(n=>n.id!==del.dataset.deleteNote);save();render();}
+});
+$('filterBtn').addEventListener('click',renderHistory);
+$('clearBtn').addEventListener('click',()=>{$('fromDate').value='';$('toDate').value='';$('searchText').value='';renderHistory();});
+$('searchText').addEventListener('input',renderHistory);
+function exportRows(){return state.trips.map(t=>({'Date':t.date,'Office ID':t.officeId,'Driver':t.driver,'Destination':t.destination,'Out Time':t.outTime,'Expected Return':t.expectedTime,'Actual Return':t.actualReturn,'Trip Note':t.note||''}));}
+$('exportBtn').addEventListener('click',()=>{
+ if(!window.XLSX)return exportCSV();
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(exportRows()),'Trip History');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(state.drivers.map(d=>({'Office ID':d.officeId,'Driver':d.name})).concat([])),'Drivers');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(state.notes.map(n=>({'Title':n.title,'Driver':driverName(n.driverId),'Location':n.place,'Date':n.date,'Time':n.time,'Details':n.details,'Completed':n.done?'Yes':'No'}))),'Reminders');
+ XLSX.writeFile(wb,`Driver_Manager_${todayISO()}.xlsx`);
+});
+function exportCSV(){
+ const rows=exportRows();const cols=Object.keys(rows[0]||{'Date':'','Office ID':'','Driver':'','Destination':'','Out Time':'','Expected Return':'','Actual Return':'','Trip Note':''});
+ const csv=[cols,...rows.map(r=>cols.map(c=>r[c]??''))].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+ download(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),`Driver_Trips_${todayISO()}.csv`);
+}
+$('exportCsvBtn').addEventListener('click',exportCSV);
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+$('backupBtn').addEventListener('click',()=>download(new Blob([JSON.stringify({...state,backupCreatedAt:new Date().toISOString()},null,2)],{type:'application/json'}),`Driver_Manager_Backup_${todayISO()}.json`));
+$('restoreBtn').addEventListener('click',async()=>{
+ const f=$('backupFile').files[0];if(!f)return showMessage('Choose a JSON backup file first.',true);
+ try{const d=JSON.parse(await f.text());if(!Array.isArray(d.drivers)||!Array.isArray(d.trips)||!Array.isArray(d.notes))throw new Error('Invalid backup structure');
+ if(!confirm('Restore this backup and replace the current browser data? Download a backup first if needed.'))return;
+ state={drivers:d.drivers,trips:d.trips,notes:d.notes};save();render();showMessage('Backup restored successfully.');
+ }catch(err){showMessage('Restore failed: '+err.message,true);}
+});
+function checkReminders(){
+ const now=`${todayISO()}T${timeNow()}`;const due=state.notes.filter(n=>!n.done&&!n.alerted&&`${n.date}T${n.time}`<=now);
+ if(due.length){
+  due.forEach(n=>n.alerted=true);save();
+  const msg=due.map(n=>`${n.title}${n.place?' — '+n.place:''} (${fmtTime(n.time)})`).join('\n');
+  $('reminderBanner').textContent='Reminder due: '+msg;$('reminderBanner').classList.add('show');
+  if(document.visibilityState==='visible')alert('Scheduled driver reminder\\n\\n'+msg);
+ }
+ const upcoming=state.notes.filter(n=>!n.done&&n.date===todayISO()).length;
+ if(!due.length&&!upcoming)$('reminderBanner').classList.remove('show');
+}
+$('noteDate').value=todayISO();$('outTime').value=timeNow();load();render();checkReminders();
+setInterval(()=>{render();checkReminders();},30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkReminders();});
+})();
+</script>
+</body>
+</html>

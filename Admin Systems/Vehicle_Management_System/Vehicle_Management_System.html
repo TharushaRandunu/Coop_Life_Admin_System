@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Vehicle Management</h1>
+      <p>Fleet, service, licence and insurance records</p>
+    </div>
+    <div class="header-actions">
+      <button id="printBtn" class="btn secondary" type="button">Print Vehicle</button>
+      <button id="exportExcelBtn" class="btn secondary" type="button">Save to Excel</button>
+      <button id="importExcelBtn" class="btn secondary" type="button">Load Excel Backup</button>
+      <button id="exportBtn" class="btn secondary" type="button">Export JSON Backup</button>
+      <input id="importExcelFile" type="file" accept=".xlsx,.xls" hidden>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel reminders-panel" aria-live="polite">
+      <div class="section-heading">
+        <div>
+          <h2>Expiry & Service Reminders</h2>
+          <p>Red means expired or overdue. Orange means due within 30 days or close to service mileage.</p>
+        </div>
+      </div>
+      <div id="reminderList" class="reminder-list"></div>
+    </section>
+
+    <section class="stats">
+      <div class="stat-card">
+        <span>Total Vehicles</span>
+        <strong id="totalVehicles">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>Cars</span>
+        <strong id="totalCars">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>Vans</span>
+        <strong id="totalVans">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>Bikes</span>
+        <strong id="totalBikes">0</strong>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <h2>Vehicle List</h2>
+          <p>Select a vehicle to view its records.</p>
+        </div>
+        <button id="addVehicleBtn" class="btn primary">
+          + Add Vehicle
+        </button>
+      </div>
+      <div id="vehicleList" class="vehicle-grid"></div>
+    </section>
+
+    <section class="panel" id="vehicleFormPanel">
+      <h2 id="vehicleFormTitle">Add Vehicle</h2>
+      <form id="vehicleForm">
+        <input type="hidden" id="vehicleId">
+
+        <div class="form-grid">
+          <label>
+            Vehicle Type *
+            <select id="vehicleType" required>
+              <option value="">Select type</option>
+              <option value="Car">Car</option>
+              <option value="Van">Van</option>
+              <option value="Bike">Bike</option>
+            </select>
+          </label>
+
+          <label>
+            Registration Number *
+            <input id="registration" required
+                   placeholder="e.g. ABC-1234">
+          </label>
+
+          <label>
+            Vehicle Name / Brand
+            <input id="vehicleName" placeholder="e.g. Toyota">
+          </label>
+
+          <label>
+            Model
+            <input id="vehicleModel" placeholder="e.g. Prius">
+          </label>
+          <label>
+            Current Mileage (km)
+            <input id="currentMileage" type="number" min="0" placeholder="e.g. 85000">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">Save Vehicle</button>
+          <button class="btn secondary" type="button"
+                  id="cancelVehicleBtn">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel" id="recordsPanel">
+      <div class="section-heading">
+        <div>
+          <h2>Vehicle Records</h2>
+          <p id="selectedVehicleLabel">Select a vehicle above.</p>
+        </div>
+      </div>
+
+      <div class="record-section">
+        <h3>Service & Maintenance Records</h3>
+        <p class="helper-text">Use Edit to correct a service date, mileage, next service mileage, or notes.</p>
+        <form id="serviceForm">
+          <input type="hidden" id="serviceId">
+
+          <div class="form-grid">
+            <label>
+              Date of Service *
+              <input type="date" id="serviceDate" required>
+            </label>
+            <label>
+              Mileage at Service *
+              <input type="number" id="serviceMileage"
+                     min="0" required>
+            </label>
+            <label>
+              Next Service Mileage *
+              <input type="number" id="nextServiceMileage"
+                     min="0" required>
+            </label>
+          </div>
+
+          <label>
+            Service Notes
+            <textarea id="serviceNotes"
+                      placeholder="Oil change, repairs, parts replaced..."></textarea>
+          </label>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">Save Service</button>
+            <button class="btn secondary" type="button"
+                    id="cancelServiceBtn">Clear</button>
+          </div>
+        </form>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date of Service</th>
+                <th>Mileage at Service</th>
+                <th>Next Service Mileage</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="serviceTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="record-section">
+        <h3>Compliance & Insurance Records</h3>
+        <form id="complianceForm">
+          <div class="form-grid">
+            <label>
+              Licence Valid From
+              <input type="date" id="licenceFrom">
+            </label>
+            <label>
+              Licence Expiry Date
+              <input type="date" id="licenceExpiry">
+            </label>
+            <label>
+              ECO Test Certificate Issue Date
+              <input type="date" id="ecoIssue">
+            </label>
+            <label>
+              Insurance Revenue Date
+              <input type="date" id="revenueDate">
+            </label>
+            <label>
+              Insurance Expiry Date
+              <input type="date" id="insuranceExpiry">
+            </label>
+          </div>
+          <div class="actions">
+            <button class="btn primary" type="submit">
+              Save Compliance Details
+            </button>
+          </div>
+        </form>
+
+        <div id="complianceStatus" class="status-list"></div>
+      </div>
+
+      <div class="danger-zone">
+        <div>
+          <h3>Remove Vehicle</h3>
+          <p>Deletes the selected vehicle and its stored records.</p>
+        </div>
+        <button id="deleteVehicleBtn" class="btn danger">
+          Remove Selected Vehicle
+        </button>
+      </div>
+    </section>
+
+    <p id="message" role="status" aria-live="polite"></p>
+    <p class="footer-note">
+      Records are stored in this browser. Export backups regularly. Expiry reminders appear when you open this page.
+    </p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
